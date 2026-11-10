@@ -39,7 +39,7 @@ The fresh-checkout check used only files admitted by the publication index, with
 | Frontend verification and screenshots | New `mpms-web/tests/apiConfig.test.mjs`; updated `mpms-web/e2e/mpms.spec.ts`; six PNGs under `docs/screenshots/` |
 | Deployment | New `Dockerfile`, `.dockerignore`, `compose.yaml`, `render.yaml`, `deploy/entrypoint.sh`, `.env.production.example` |
 | Source and CI preparation | Updated `.gitignore`; new `.gitattributes`, `.config/dotnet-tools.json`, `.github/workflows/ci.yml` |
-| Documentation | New root `README.md`, `docs/DEPLOYMENT.md`, `docs/GITHUB-PUBLICATION.md`, `docs/PORTFOLIO.md`, this report; updated `QA.md`, both project READMEs |
+| Documentation | Root `README.md`, `docs/DEPLOYMENT.md`, `docs/GITHUB-PUBLICATION.md`, this report; updated `QA.md`, both project READMEs |
 | Unused boilerplate removed | `ManufacturingMonitor.Api/WeatherForecast.cs`, `ManufacturingMonitor.Api/Controllers/WeatherForecastController.cs` |
 
 No model/schema migration, existing record, dashboard calculation, CRUD contract, navigation redesign or new UI framework was introduced. Local CRUD remains available; only the public-demo configuration disables it.

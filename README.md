@@ -53,7 +53,7 @@ Locally, Vite proxies `/api` to port 5084. The recommended hosted layout package
 ManufacturingMonitor.Api/          API, model, EF migrations, explicit seed commands
 ManufacturingMonitor.Api.Tests/    xUnit integration tests and separate browser-test host
 mpms-web/                         React application, logic/API tests, Playwright tests
-docs/                             Deployment, portfolio, publication notes, real screenshots
+docs/                             Deployment, verification, publication notes, real screenshots
 .github/workflows/ci.yml           Builds, tests, audits, container smoke check; no deployment
 Dockerfile, compose.yaml           Single-service image and local persistent-volume example
 render.yaml                       Paid Docker service + persistent disk; manual deploys
@@ -197,13 +197,20 @@ Actual screenshots from an isolated QA database with **84 simulated records**; n
 
 </details>
 
-Regenerate screenshots using the documented isolated Playwright capture command in [the portfolio guide](docs/PORTFOLIO.md).
+To regenerate screenshots from the isolated QA database, run from `mpms-web` in PowerShell:
 
-## Deployment, GitHub and portfolio
+```powershell
+$env:MPMS_TEST_BROWSER = 'chrome'
+$env:MPMS_CAPTURE_SCREENSHOTS = 'true'
+npm.cmd run test:e2e -- --grep 'desktop and mobile fit'
+```
+
+Omit `MPMS_TEST_BROWSER` to use Playwright's installed Chromium.
+
+## Deployment and GitHub
 
 - [Deployment runbook](docs/DEPLOYMENT.md): hosting research, storage, environment values, backups, and exact steps requiring owner action.
 - [Publication checklist](docs/GITHUB-PUBLICATION.md): repository identity, clean-source review and publication checks.
-- [Portfolio and CV text](docs/PORTFOLIO.md): factual descriptions, ATS-friendly bullets, screenshots and interview explanation.
 - GitHub Actions verifies code and a Docker smoke test; it contains no service credentials and deploys nothing. The Render Blueprint disables automatic deployments.
 
 ## Limitations
