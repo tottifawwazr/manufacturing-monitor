@@ -1,0 +1,24 @@
+@api = http://localhost:5084
+
+GET {{api}}/healthz/live
+Accept: application/json
+
+###
+GET {{api}}/healthz/ready
+Accept: application/json
+
+###
+GET {{api}}/api/dashboard/summary?startDate=2026-10-28&endDate=2026-11-10&productionLine=Line%20B
+Accept: application/json
+
+###
+GET {{api}}/api/dashboard/trend
+Accept: application/json
+
+###
+GET {{api}}/api/dashboard/lines
+Accept: application/json
+
+###
+GET {{api}}/api/productionlogs
+Accept: application/json

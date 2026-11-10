@@ -1,0 +1,66 @@
+name: Verify MPMS
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: 10.0.x
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24.x
+      - run: dotnet tool restore
+      - run: dotnet build MPMS.sln --artifacts-path .artifacts/ci
+      - run: dotnet test MPMS.sln --no-build --no-restore --artifacts-path .artifacts/ci
+      - run: dotnet list MPMS.sln package --vulnerable --include-transitive
+      - run: npm ci
+        working-directory: mpms-web
+      - run: npm run build && npm run lint && npm test
+        working-directory: mpms-web
+      - run: npm audit --omit=dev --audit-level=moderate
+        working-directory: mpms-web
+      - run: npm audit --audit-level=high
+        working-directory: mpms-web
+      - run: npx playwright install --with-deps chromium
+        working-directory: mpms-web
+      - run: npm run test:e2e
+        working-directory: mpms-web
+  container-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build image without local databases or environment files
+        run: docker build -t mpms:ci .
+      - name: Initialize a fresh isolated volume and verify persistence
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker volume create mpms-ci
+          opts=(-e AllowedHosts=localhost -e 'ConnectionStrings__DefaultConnection=Data Source=/var/lib/mpms/mpms-production.db' -e Demo__ReadOnly=true -v mpms-ci:/var/lib/mpms)
+          docker run --rm "${opts[@]}" mpms:ci --initialize-production-demo
+          docker run -d --name mpms-ci -p 127.0.0.1:8080:8080 "${opts[@]}" mpms:ci
+          for attempt in {1..30}; do curl -fsS http://localhost:8080/healthz/ready && break || sleep 2; done
+          curl -fsS http://localhost:8080/healthz/ready
+          curl -fsS http://localhost:8080/production-logs -o /tmp/mpms-index.html
+          grep -q 'MPMS' /tmp/mpms-index.html
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' --data '{}' http://localhost:8080/api/productionlogs)" = 403
+          docker restart mpms-ci
+          for attempt in {1..30}; do curl -fsS http://localhost:8080/healthz/ready && break || sleep 2; done
+          python -c "import json,urllib.request; data=json.load(urllib.request.urlopen('http://localhost:8080/api/dashboard/summary')); assert data['recordCount']==84 and data['simulatedRecordCount']==84"
+      - name: Clean up CI resources
+        if: always()
+        run: |
+          docker rm -f mpms-ci || true
+          docker volume rm mpms-ci || true

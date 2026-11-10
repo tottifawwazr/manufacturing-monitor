@@ -1,0 +1,28 @@
+# Preparation only. Creating this Blueprint incurs a paid service/disk charge.
+services:
+  - type: web
+    name: mpms-demo
+    runtime: docker
+    plan: starter
+    numInstances: 1
+    autoDeployTrigger: "off"
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz/live
+    disk:
+      name: mpms-production-data
+      mountPath: /var/lib/mpms
+      sizeGB: 1
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_HTTP_PORTS
+        value: "8080"
+      - key: PORT
+        value: "8080"
+      - key: ConnectionStrings__DefaultConnection
+        value: Data Source=/var/lib/mpms/mpms-production.db
+      - key: Demo__ReadOnly
+        value: "true"
+      - key: AllowedHosts
+        sync: false

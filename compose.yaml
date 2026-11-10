@@ -1,0 +1,16 @@
+services:
+  mpms:
+    build:
+      context: .
+      args:
+        VITE_API_BASE_URL: /api
+        VITE_DEMO_READ_ONLY: "true"
+    env_file: .env.production
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - mpms-production-data:/var/lib/mpms
+    restart: unless-stopped
+    stop_grace_period: 20s
+volumes:
+  mpms-production-data:

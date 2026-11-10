@@ -1,0 +1,37 @@
+# Local builds, restored dependencies, and QA output
+.artifacts/
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+**/test-results/
+**/playwright-report/
+**/blob-report/
+*.log
+
+# Local SQLite data is never a test fixture or a source artifact.
+*.db
+*.db-shm
+*.db-wal
+.vs/
+
+# Never publish environment values, credentials, private keys, or user IDE files.
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+**/appsettings.Local.json
+**/appsettings.*.local.json
+**/secrets.json
+*.pfx
+*.p12
+*.pem
+*.key
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+**/*.csproj.user
+**/*.suo
+.vscode/
+.idea/
